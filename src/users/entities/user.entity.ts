@@ -7,6 +7,15 @@ import {
 } from 'typeorm';
 import { UserRoles } from '../enums/user-roles.enum';
 
+export interface IUser {
+  id?: string;
+  firstName: string;
+  lastName: string;
+  role: UserRoles;
+  password: string;
+  email: string;
+}
+
 @Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn('uuid')

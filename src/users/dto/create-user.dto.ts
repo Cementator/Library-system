@@ -22,7 +22,7 @@ export class CreateUserDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsEnum(UserRoles)
-  role: string;
+  role: UserRoles;
 
   @ApiProperty()
   @IsNotEmpty()
