@@ -1,9 +1,12 @@
-import { TypeOrmOptionsFactory, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { TypeOrmOptionsFactory, TypeOrmModuleOptions } from '@nestjs/typeorm';
 
+@Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
   constructor(private readonly configService: ConfigService) {}
   async createTypeOrmOptions(): Promise<TypeOrmModuleOptions> {
+    console.log('dbConfig:', this.configService.get('POSTGRES_PASS'));
     return {
       type: 'postgres',
       host: this.configService.get<string>('POSTGRES_HOST'),
