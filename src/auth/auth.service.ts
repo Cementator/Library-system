@@ -15,7 +15,6 @@ export class AuthService {
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...user } = await this.userService.create(userData);
-    console.log(user);
     return user;
   }
 }

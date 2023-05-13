@@ -1,4 +1,5 @@
 import {
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -6,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRoles } from '../enums/user-roles.enum';
+import * as bcrypt from 'bcrypt';
 
 export interface IUser {
   id?: string;
@@ -41,4 +43,13 @@ export class User {
 
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
+
+  // Hash a password
+  @BeforeInsert()
+  async hashPass(): Promise<void> {
+    if (this.password) {
+      const salt = await bcrypt.genSalt(10);
+      this.password = await bcrypt.hash(this.password, salt);
+    }
+  }
 }
