@@ -16,7 +16,7 @@ export class Author {
   @Column({ type: 'varchar', nullable: false })
   name: string;
 
-  @OneToMany(() => Book, (book) => book.author, { onDelete: 'CASCADE' })
+  @OneToMany(() => Book, (book) => book.author)
   books: Book[];
 
   @CreateDateColumn({ type: 'timestamptz' })
