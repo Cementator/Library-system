@@ -6,6 +6,8 @@ import { TypeOrmConfigService } from './db/postgres.config';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { BooksModule } from './books/books.module';
+import { AuthorsModule } from './authors/authors.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { AuthModule } from './auth/auth.module';
     }),
     UsersModule,
     AuthModule,
+    BooksModule,
+    AuthorsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
