@@ -7,3 +7,8 @@ export class AuthorResponse {
   @ApiProperty()
   name: string;
 }
+
+export class AuthorsResponse {
+  @ApiProperty({ type: [AuthorResponse] })
+  authors: AuthorResponse[];
+}

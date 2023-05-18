@@ -10,4 +10,7 @@ export interface FindParams<T> {
   where?: FindOptionsWhere<T> | FindOptionsWhere<T>[];
   relations?: FindOptionsRelations<T>;
   order?: FindOptionsOrder<T>;
+  search?: string;
+  skip?: number;
+  take?: number;
 }

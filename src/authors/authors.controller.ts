@@ -6,12 +6,14 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { AuthorsService } from './authors.service';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthorResponse } from './responses/author.response';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AuthorResponse, AuthorsResponse } from './responses/author.response';
+import { FindAuthorsQueryParams } from './dto/find-authors.dto';
 
 @ApiTags('Authors')
 @Controller('authors')
@@ -29,12 +31,19 @@ export class AuthorsController {
     return this.authorsService.create(createAuthorDto);
   }
 
+  @ApiOperation({ summary: 'Get authors' })
+  @ApiResponse({
+    status: 200,
+    description: 'Array of author records',
+    type: AuthorsResponse,
+  })
   @Get()
-  findAll() {
-    return this.authorsService.findAll();
+  findAll(@Query() query: FindAuthorsQueryParams) {
+    const { page, limit, search } = query;
+    return this.authorsService.searchAndFind(page, limit, search);
   }
 
-  @ApiOperation({ summary: 'Login user' })
+  @ApiOperation({ summary: 'Get author by id' })
   @ApiResponse({
     status: 200,
     description: 'Author record',
@@ -45,11 +54,23 @@ export class AuthorsController {
     return this.authorsService.findOne({ where: { id: id } });
   }
 
+  @ApiOperation({ summary: 'Update an author' })
+  @ApiResponse({
+    status: 200,
+    description: 'Update an author',
+    type: AuthorResponse,
+  })
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAuthorDto: UpdateAuthorDto) {
     return this.authorsService.update(+id, updateAuthorDto);
   }
 
+  @ApiOperation({ summary: 'Delete an author' })
+  @ApiResponse({
+    status: 200,
+    description: 'Delete an author',
+    type: AuthorResponse,
+  })
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.authorsService.remove(+id);
