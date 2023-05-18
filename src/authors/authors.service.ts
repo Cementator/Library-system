@@ -1,9 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthorDto } from './dto/create-author.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateAuthorDto } from './dto/update-author.dto';
 import { FindParams } from 'src/utils/findParams';
 import { Author } from './entities/author.entity';
-import { DeepPartial, ILike, Repository } from 'typeorm';
+import {
+  DeepPartial,
+  DeleteResult,
+  FindOptionsWhere,
+  ILike,
+  Repository,
+} from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
@@ -52,20 +57,46 @@ export class AuthorsService {
     where,
     relations,
   }: FindParams<Author>): Promise<Author | null> {
-    return await this.authorRepository.findOne({ select, where, relations });
-  }
-
-  update(id: number, updateAuthorDto: UpdateAuthorDto) {
-    return `This action updates a #${id} author`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} author`;
+    const author = await this.authorRepository.findOne({
+      select,
+      where,
+      relations,
+    });
+    if (!author) {
+      throw new NotFoundException('Author not found.');
+    }
+    return author;
   }
 
   /**
-   * @description Find all Author entities
-   * @param where
+   * @description Update Author entity by id
+   * @param id
+   * @param updateAuthorDto
+   * @returns Author entity
+   */
+  async update(id: string, updateAuthorDto: UpdateAuthorDto) {
+    const author = await this.findOne({ where: { id } });
+    if (!author) {
+      throw new NotFoundException('Author not found.');
+    }
+    author.name = updateAuthorDto.name;
+    return await this.authorRepository.save(author);
+  }
+
+  /**
+   * @description Update Author entity by id
+   * @param id
+   * @returns Author entity
+   */
+  async remove(id: string): Promise<DeleteResult> {
+    return await this.authorRepository.delete(id);
+  }
+
+  /**
+   * @description Find all Author entities with search and paginate them
+   * @param page
+   * @param limit
+   * @param search
    * @returns Author entity
    */
   async searchAndFind(
@@ -74,7 +105,7 @@ export class AuthorsService {
     search?: string,
   ): Promise<Author[]> {
     const skip = (page - 1) * limit; // Calculate the number of items to skip
-    let where;
+    let where: FindOptionsWhere<Author>;
 
     if (search) {
       where = {

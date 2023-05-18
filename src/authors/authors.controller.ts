@@ -14,6 +14,7 @@ import { UpdateAuthorDto } from './dto/update-author.dto';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthorResponse, AuthorsResponse } from './responses/author.response';
 import { FindAuthorsQueryParams } from './dto/find-authors.dto';
+import { DeleteResponse } from 'src/utils/delete-result';
 
 @ApiTags('Authors')
 @Controller('authors')
@@ -62,17 +63,17 @@ export class AuthorsController {
   })
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAuthorDto: UpdateAuthorDto) {
-    return this.authorsService.update(+id, updateAuthorDto);
+    return this.authorsService.update(id, updateAuthorDto);
   }
 
   @ApiOperation({ summary: 'Delete an author' })
   @ApiResponse({
     status: 200,
     description: 'Delete an author',
-    type: AuthorResponse,
+    type: DeleteResponse,
   })
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.authorsService.remove(+id);
+    return this.authorsService.remove(id);
   }
 }
