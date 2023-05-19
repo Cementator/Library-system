@@ -1,5 +1,6 @@
 import { Author } from 'src/authors/entities/author.entity';
 import {
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -32,4 +33,12 @@ export class Book {
 
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
+
+  // Set available number of copies
+  @BeforeInsert()
+  async assignAvailableBooks(): Promise<void> {
+    if (this.hardCopies) {
+      this.availableCopies = this.hardCopies;
+    }
+  }
 }
