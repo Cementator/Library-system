@@ -1,11 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DeepPartial, Repository } from 'typeorm';
+import { Book } from './entities/book.entity';
+import { AuthorsService } from 'src/authors/authors.service';
 
 @Injectable()
 export class BooksService {
-  create(createBookDto: CreateBookDto) {
-    return 'This action adds a new book';
+  constructor(
+    @InjectRepository(Book) private booksRepository: Repository<Book>,
+    private readonly authorService: AuthorsService,
+  ) {}
+  /**
+   * @description Create Book entity
+   * @param bookData
+   * @returns Book entity
+   */
+  async create(bookData: DeepPartial<Book>): Promise<Book> {
+    const book = this.booksRepository.create(bookData);
+    return await this.booksRepository.save(book);
   }
 
   findAll() {
@@ -22,5 +36,30 @@ export class BooksService {
 
   remove(id: number) {
     return `This action removes a #${id} book`;
+  }
+
+  /**
+   * @description Create Book entity and author if he doesnt exist
+   * @param bookData
+   * @returns Book entity
+   */
+
+  async createBookAndAuthor(bookData: CreateBookDto): Promise<Book> {
+    let author = await this.authorService.findOne({
+      where: { name: bookData.author },
+    });
+
+    if (!author) {
+      author = await this.authorService.create({
+        name: bookData.author,
+      });
+    }
+    const bookProperties: DeepPartial<Book> = {
+      title: bookData.title,
+      hardCopies: bookData.hardCopies,
+      author: author,
+    };
+    const book = await this.create(bookProperties);
+    return book;
   }
 }
