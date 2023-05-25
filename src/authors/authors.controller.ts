@@ -11,10 +11,11 @@ import {
 import { AuthorsService } from './authors.service';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthorResponse, AuthorsResponse } from './responses/author.response';
 import { FindAuthorsQueryParams } from './dto/find-authors.dto';
 import { DeleteResponse } from 'src/utils/delete-result';
+import { AuthorParams } from './dto/author-params.dto';
 
 @ApiTags('Authors')
 @Controller('authors')
@@ -50,9 +51,12 @@ export class AuthorsController {
     description: 'Author record',
     type: AuthorResponse,
   })
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authorsService.findOne({ where: { id: id } });
+  @Get(':authorId')
+  findOne(@Param() { authorId }: AuthorParams) {
+    return this.authorsService.findOne({
+      where: { id: authorId },
+      relations: { books: true },
+    });
   }
 
   @ApiOperation({ summary: 'Update an author' })
@@ -61,9 +65,12 @@ export class AuthorsController {
     description: 'Update an author',
     type: AuthorResponse,
   })
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthorDto: UpdateAuthorDto) {
-    return this.authorsService.update(id, updateAuthorDto);
+  @Patch(':authorId')
+  update(
+    @Param() { authorId }: AuthorParams,
+    @Body() updateAuthorDto: UpdateAuthorDto,
+  ) {
+    return this.authorsService.update(authorId, updateAuthorDto);
   }
 
   @ApiOperation({ summary: 'Delete an author' })
@@ -72,8 +79,8 @@ export class AuthorsController {
     description: 'Delete an author',
     type: DeleteResponse,
   })
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authorsService.remove(id);
+  @Delete(':authorId')
+  remove(@Param() { authorId }: AuthorParams) {
+    return this.authorsService.remove(authorId);
   }
 }

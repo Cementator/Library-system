@@ -14,7 +14,7 @@ export class BookResponse {
   @ApiProperty()
   availableCopies: string;
 
-  @ApiProperty({ type: AuthorResponse })
+  @ApiProperty({ type: () => AuthorResponse })
   author: AuthorResponse;
 }
 
