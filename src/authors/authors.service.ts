@@ -62,9 +62,6 @@ export class AuthorsService {
       where,
       relations,
     });
-    if (!author) {
-      throw new NotFoundException('Author not found.');
-    }
     return author;
   }
 

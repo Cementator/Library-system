@@ -1,10 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, Repository } from 'typeorm';
 import { Book } from './entities/book.entity';
 import { AuthorsService } from 'src/authors/authors.service';
+import { FindParams } from 'src/utils/findParams';
 
 @Injectable()
 export class BooksService {
@@ -26,8 +31,22 @@ export class BooksService {
     return `This action returns all books`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} book`;
+  /**
+   * @description Find Book entity
+   * @param where
+   * @returns Book entity
+   */
+  async findOne({
+    select,
+    where,
+    relations,
+  }: FindParams<Book>): Promise<Book | null> {
+    const book = await this.booksRepository.findOne({
+      select,
+      where,
+      relations,
+    });
+    return book;
   }
 
   update(id: number, updateBookDto: UpdateBookDto) {
@@ -45,6 +64,14 @@ export class BooksService {
    */
 
   async createBookAndAuthor(bookData: CreateBookDto): Promise<Book> {
+    const existingBook = await this.findOne({
+      where: { title: bookData.title },
+    });
+    if (existingBook) {
+      throw new ConflictException(
+        'Book with this title is already in the database.',
+      );
+    }
     let author = await this.authorService.findOne({
       where: { name: bookData.author },
     });
