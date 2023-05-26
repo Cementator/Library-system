@@ -6,7 +6,13 @@ import {
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, FindOptionsWhere, ILike, Repository } from 'typeorm';
+import {
+  DeepPartial,
+  DeleteResult,
+  FindOptionsWhere,
+  ILike,
+  Repository,
+} from 'typeorm';
 import { Book } from './entities/book.entity';
 import { AuthorsService } from 'src/authors/authors.service';
 import { FindParams } from 'src/utils/findParams';
@@ -66,12 +72,29 @@ export class BooksService {
     return book;
   }
 
-  update(id: number, updateBookDto: UpdateBookDto) {
-    return `This action updates a #${id} book`;
+  /**
+   * @description Update Book entity by id
+   * @param id
+   * @param updateBookDto
+   * @returns Book entity
+   */
+  async update(id: string, updateBookDto: UpdateBookDto) {
+    const book = await this.findOne({ where: { id } });
+    if (!book) {
+      throw new NotFoundException('Book not found.');
+    }
+    book.hardCopies = updateBookDto.hardCopies;
+    book.title = updateBookDto.title;
+    return await this.booksRepository.save(book);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} book`;
+  /**
+   * @description Delete Book entity by id
+   * @param id
+   * @returns Delete result
+   */
+  async remove(id: string): Promise<DeleteResult> {
+    return await this.booksRepository.delete(id);
   }
 
   /**

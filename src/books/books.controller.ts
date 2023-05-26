@@ -15,6 +15,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BookResponse, BooksResponse } from './responses/book.response';
 import { BookParams } from './dto/book-params.dto';
 import { FindBooksQueryParams } from './dto/find-books.dto';
+import { DeleteResponse } from 'src/utils/delete-result';
 
 @ApiTags('Books')
 @Controller('books')
@@ -58,13 +59,28 @@ export class BooksController {
     });
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
-    return this.booksService.update(+id, updateBookDto);
+  @ApiOperation({ summary: 'Update a book' })
+  @ApiResponse({
+    status: 200,
+    description: 'Update a book',
+    type: BookResponse,
+  })
+  @Patch(':bookId')
+  update(
+    @Param() { bookId }: BookParams,
+    @Body() updateBookDto: UpdateBookDto,
+  ) {
+    return this.booksService.update(bookId, updateBookDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.booksService.remove(+id);
+  @ApiOperation({ summary: 'Delete a book' })
+  @ApiResponse({
+    status: 200,
+    description: 'Delete a abook',
+    type: DeleteResponse,
+  })
+  @Delete(':bookId')
+  remove(@Param() { bookId }: BookParams) {
+    return this.booksService.remove(bookId);
   }
 }

@@ -81,9 +81,9 @@ export class AuthorsService {
   }
 
   /**
-   * @description Update Author entity by id
+   * @description Delete Book entity by id
    * @param id
-   * @returns Author entity
+   * @returns Delete result
    */
   async remove(id: string): Promise<DeleteResult> {
     return await this.authorRepository.delete(id);
