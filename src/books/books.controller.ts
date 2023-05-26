@@ -6,13 +6,15 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { BookResponse } from './responses/book.response';
+import { BookResponse, BooksResponse } from './responses/book.response';
 import { BookParams } from './dto/book-params.dto';
+import { FindBooksQueryParams } from './dto/find-books.dto';
 
 @ApiTags('Books')
 @Controller('books')
@@ -30,9 +32,16 @@ export class BooksController {
     return this.booksService.createBookAndAuthor(createBookDto);
   }
 
+  @ApiOperation({ summary: 'Get books' })
+  @ApiResponse({
+    status: 200,
+    description: 'Array of book records',
+    type: BooksResponse,
+  })
   @Get()
-  findAll() {
-    return this.booksService.findAll();
+  findAll(@Query() query: FindBooksQueryParams) {
+    const { page, limit, search } = query;
+    return this.booksService.searchAndFind(page, limit, search);
   }
 
   @ApiOperation({ summary: 'Get book by id' })

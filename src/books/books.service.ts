@@ -6,7 +6,7 @@ import {
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, Repository } from 'typeorm';
+import { DeepPartial, FindOptionsWhere, ILike, Repository } from 'typeorm';
 import { Book } from './entities/book.entity';
 import { AuthorsService } from 'src/authors/authors.service';
 import { FindParams } from 'src/utils/findParams';
@@ -27,8 +27,25 @@ export class BooksService {
     return await this.booksRepository.save(book);
   }
 
-  findAll() {
-    return `This action returns all books`;
+  /**
+   * @description Find all Book entities
+   * @param where
+   * @returns Book entities
+   */
+  async findAll({
+    select,
+    where,
+    relations,
+    skip,
+    take,
+  }: FindParams<Book>): Promise<Book[] | null> {
+    return await this.booksRepository.find({
+      select,
+      where,
+      relations,
+      skip,
+      take,
+    });
   }
 
   /**
@@ -88,5 +105,34 @@ export class BooksService {
     };
     const book = await this.create(bookProperties);
     return book;
+  }
+
+  /**
+   * @description Find all Book entities with search and paginate them
+   * @param page
+   * @param limit
+   * @param search
+   * @returns Book entities
+   */
+  async searchAndFind(
+    page: number,
+    limit: number,
+    search?: string,
+  ): Promise<Book[]> {
+    const skip = (page - 1) * limit; // Calculate the number of items to skip
+    let where: FindOptionsWhere<Book>;
+
+    if (search) {
+      where = {
+        title: ILike(`%${search}%`), // Case-insensitive search
+      };
+    }
+
+    return await this.findAll({
+      where,
+      relations: { author: true },
+      skip,
+      take: limit, // Set the maximum number of items to retrieve
+    });
   }
 }

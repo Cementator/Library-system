@@ -29,7 +29,7 @@ export class AuthorsService {
   /**
    * @description Find all Author entities
    * @param where
-   * @returns Author entity
+   * @returns Author entities
    */
   async findAll({
     select,
@@ -94,7 +94,7 @@ export class AuthorsService {
    * @param page
    * @param limit
    * @param search
-   * @returns Author entity
+   * @returns Author entities
    */
   async searchAndFind(
     page: number,
